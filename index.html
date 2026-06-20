@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Private</title>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #121212;
+      color: #e0e0e0;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #222;
+    }
+
+    h2 {
+      margin: 0;
+      color: #fff;
+      font-size: 22px;
+    }
+
+    .history-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background-color: #1e1e1e;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid #333;
+    }
+
+    .history-controls label {
+      color: #b0b0b0;
+      font-weight: bold;
+      font-size: 13px;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    select {
+      background-color: #252525;
+      color: #e0e0e0;
+      border: 1px solid #444;
+      padding: 6px 30px 6px 10px;
+      font-size: 13px;
+      border-radius: 4px;
+      outline: none;
+      max-width: 250px;
+      cursor: pointer;
+    }
+
+    select:focus {
+      border-color: #bb86fc;
+    }
+
+    .icon-btn-inline {
+      background: #252525;
+      border: 1px solid #444;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 6px 10px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .icon-btn-inline.save {
+      color: #03dac6;
+    }
+
+    .icon-btn-inline.save:hover {
+      background-color: #03dac6;
+      color: #121212;
+    }
+
+    .icon-btn-inline.delete {
+      color: #ef5350;
+    }
+
+    .icon-btn-inline.delete:hover {
+      background-color: #ef5350;
+      color: #121212;
+    }
+
+    .main-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      flex: 1;
+      width: 100%;
+      height: calc(100% - 65px);
+    }
+
+    .box-wrapper {
+      flex: 1.2;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .box-wrapper.half {
+      flex: 0.8;
+    }
+
+    label.field-label {
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #b0b0b0;
+      font-size: 14px;
+    }
+
+    textarea {
+      width: 100%;
+      flex: 1;
+      padding: 15px;
+      padding-right: 55px;
+      background-color: #1e1e1e;
+      color: #ffffff;
+      border: 2px solid #333;
+      border-radius: 8px;
+      resize: none;
+      font-size: 18px;
+      line-height: 1.6;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    textarea:focus {
+      border-color: #bb86fc;
+    }
+
+    .note-area {
+      width: 100%;
+      flex: 1;
+      padding: 15px;
+      background-color: #1e1e1e;
+      color: #ffffff;
+      border: 2px solid #333;
+      border-radius: 8px;
+      resize: none;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .note-area:focus {
+      border-color: #03dac6;
+    }
+
+    .speak-icon-btn {
+      position: absolute;
+      top: 42px;
+      right: 15px;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      color: #bb86fc;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+      transition: all 0.2s;
+      z-index: 10;
+    }
+
+    .speak-icon-btn:hover {
+      background: #bb86fc;
+      color: #121212;
+      transform: scale(1.05);
+    }
+
+    .speak-icon-btn.playing {
+      color: #ffb74d;
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        opacity: 0.6;
+      }
+
+      50% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0.6;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="top-bar">
+    <h2>Phát Âm & Ghi Chú Tiếng Anh</h2>
+
+    <div class="history-controls">
+      <label for="history-select"><i class="ri-history-line"></i> Lịch sử:</label>
+      <select id="history-select">
+        <option value="">-- Chọn đoạn văn đã lưu --</option>
+      </select>
+
+      <button id="save-btn" class="icon-btn-inline save" title="Lưu đoạn văn hiện tại vào OPFS"><i
+          class="ri-save-line"></i></button>
+      <button id="delete-item-btn" class="icon-btn-inline delete" title="Xóa mục đang chọn khỏi OPFS"><i
+          class="ri-delete-bin-6-line"></i></button>
+    </div>
+  </div>
+
+  <div class="main-layout">
+    <div class="box-wrapper">
+      <label class="field-label" for="text-to-speak">Đoạn văn bản tiếng Anh:</label>
+      <textarea id="text-to-speak" placeholder="Dán hoặc nhập đoạn tiếng Anh vào đây..."></textarea>
+      <button id="speak-btn" class="speak-icon-btn" title="Phát âm"><i class="ri-volume-up-fill"></i></button>
+    </div>
+
+    <div class="box-wrapper half">
+      <label class="field-label" for="text-note">Ghi chú cá nhân cho đoạn văn trên:</label>
+      <textarea id="text-note" class="note-area"
+        placeholder="Nhập từ vựng cần nhớ, cấu trúc hoặc giải nghĩa cho đoạn văn này..."></textarea>
+    </div>
+  </div>
+
+  <script>
+    const textArea = document.getElementById('text-to-speak');
+    const noteArea = document.getElementById('text-note');
+    const speakBtn = document.getElementById('speak-btn');
+    const saveBtn = document.getElementById('save-btn');
+    const historySelect = document.getElementById('history-select');
+    const deleteItemBtn = document.getElementById('delete-item-btn');
+
+    const FILE_NAME = "data_notes_v3.json";
+    let savedData = [];
+
+    async function getOPFSFileHandle() {
+      const root = await navigator.storage.getDirectory();
+      return await root.getFileHandle(FILE_NAME, { create: true });
+    }
+
+    async function loadDataFromOPFS() {
+      try {
+        const fileHandle = await getOPFSFileHandle();
+        const file = await fileHandle.getFile();
+        const text = await file.text();
+        if (text) {
+          savedData = JSON.parse(text);
+        } else {
+          savedData = [];
+        }
+      } catch (e) {
+        console.error("Lỗi đọc OPFS:", e);
+        savedData = [];
+      }
+      updateDropdown();
+    }
+
+    async function saveDataToOPFS() {
+      try {
+        const fileHandle = await getOPFSFileHandle();
+        const writable = await fileHandle.createWritable();
+        await writable.write(JSON.stringify(savedData, null, 2));
+        await writable.close();
+      } catch (e) {
+        console.error("Lỗi ghi OPFS:", e);
+        alert("Không thể lưu file vào hệ thống!");
+      }
+    }
+
+    function updateDropdown() {
+      historySelect.innerHTML = '<option value="">-- Chọn đoạn văn đã lưu --</option>';
+
+      [...savedData].reverse().forEach((item, index) => {
+        const actualIndex = savedData.length - 1 - index;
+        const option = document.createElement('option');
+        option.value = actualIndex;
+
+        let shortText = item.text.substring(0, 30);
+        if (item.text.length > 30) shortText += "...";
+
+        option.textContent = `[${item.date}] ${shortText}`;
+        historySelect.appendChild(option);
+      });
+    }
+
+    historySelect.addEventListener('change', () => {
+      const selectedIndex = historySelect.value;
+      if (selectedIndex !== "") {
+        const item = savedData[selectedIndex];
+        textArea.value = item.text;
+        noteArea.value = item.note;
+      }
+    });
+
+    saveBtn.addEventListener('click', async () => {
+      const text = textArea.value.trim();
+      const note = noteArea.value.trim();
+
+      if (!text) {
+        alert("Vui lòng nhập đoạn tiếng Anh trước khi lưu!");
+        return;
+      }
+
+      const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+      const timestamp = new Date().toLocaleDateString('vi-VN', options);
+
+      savedData.push({
+        text: text,
+        note: note,
+        date: timestamp
+      });
+
+      await saveDataToOPFS();
+      updateDropdown();
+
+      historySelect.value = savedData.length - 1;
+      alert("Đã lưu đoạn văn và ghi chú vào OPFS!");
+    });
+
+    deleteItemBtn.addEventListener('click', async () => {
+      const selectedIndex = historySelect.value;
+      if (selectedIndex === "") {
+        alert("Vui lòng chọn một mục từ danh sách lịch sử để xóa!");
+        return;
+      }
+
+      if (confirm("Bạn có chắc chắn muốn xóa mục lịch sử này không?")) {
+        savedData.splice(selectedIndex, 1);
+        await saveDataToOPFS();
+        updateDropdown();
+
+        textArea.value = '';
+        noteArea.value = '';
+      }
+    });
+
+    // --- CHỨC NĂNG PHÁT ÂM (Web Speech API) ---
+    speakBtn.addEventListener('click', () => {
+      const text = textArea.value.trim();
+
+      if (text === '') {
+        alert('Không có văn bản để phát âm!');
+        return;
+      }
+
+      if ('speechSynthesis' in window) {
+        if (window.speechSynthesis.speaking) {
+          window.speechSynthesis.cancel();
+          setSpeakState(false);
+          return;
+        }
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = 0.95;
+
+        utterance.onstart = () => setSpeakState(true);
+        utterance.onend = () => setSpeakState(false);
+        utterance.onerror = () => setSpeakState(false);
+
+        window.speechSynthesis.speak(utterance);
+      } else {
+        alert('Trình duyệt của bạn không hỗ trợ chức năng phát âm.');
+      }
+    });
+
+    function setSpeakState(isPlaying) {
+      if (isPlaying) {
+        speakBtn.classList.add('playing');
+        speakBtn.innerHTML = '<i class="ri-volume-mute-fill"></i>';
+        speakBtn.setAttribute('title', 'Bấm để dừng nói');
+      } else {
+        speakBtn.classList.remove('playing');
+        speakBtn.innerHTML = '<i class="ri-volume-up-fill"></i>';
+        speakBtn.setAttribute('title', 'Phát âm');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', loadDataFromOPFS);
+  </script>
+
+</body>
+
+</html>
