@@ -42,7 +42,7 @@
 
     h2 { 
       margin: 0; 
-      color: #fff; 
+      color: #cccccc; 
       font-size: 22px; 
       white-space: nowrap; 
     }
@@ -98,8 +98,8 @@
     }
 
     .custom-dropdown.open .dropdown-selected {
-      border-color: #03dac6;
-      box-shadow: 0 0 0 2px rgba(3, 218, 198, 0.2);
+      border-color: #00A699;
+      box-shadow: 0 0 0 2px rgba(0, 166, 153, 0.2);
     }
 
     .dropdown-selected::after {
@@ -169,12 +169,12 @@
     }
 
     .dropdown-item:hover {
-      background-color: rgba(3, 218, 198, 0.1);
-      color: #03dac6;
+      background-color: rgba(0, 166, 153, 0.1);
+      color: #00A699;
     }
 
     .dropdown-item.selected {
-      background-color: rgba(3, 218, 198, 0.15);
+      background-color: rgba(0, 166, 153, 0.15);
       color: #fff;
       font-weight: bold;
     }
@@ -192,10 +192,10 @@
       transition: background 0.15s, color 0.15s;
     }
 
-    .icon-btn-inline.save { color: #03dac6; }
-    .icon-btn-inline.save:hover { background-color: #03dac6; color: #121212; }
-    .icon-btn-inline.refresh { color: #64b5f6; }
-    .icon-btn-inline.refresh:hover { background-color: #64b5f6; color: #121212; }
+    .icon-btn-inline.save { color: #00A699; }
+    .icon-btn-inline.save:hover { background-color: #00A699; color: #121212; }
+    .icon-btn-inline.refresh { color: #528BBA; }
+    .icon-btn-inline.refresh:hover { background-color: #528BBA; color: #121212; }
     .icon-btn-inline.delete { color: #ef5350; }
     .icon-btn-inline.delete:hover { background-color: #ef5350; color: #121212; }
 
@@ -281,23 +281,23 @@
       transition: background 0.12s, color 0.12s;
     }
 
-    .hover-word.color-0 { color: #03dac6; }
-    .hover-word.color-1 { color: #ffb74d; }
-    .hover-word.color-2 { color: #f48fb1; }
-    .hover-word.color-3 { color: #81c784; }
-    .hover-word.color-4 { color: #64b5f6; }
-    .hover-word.color-5 { color: #fff176; }
+    .hover-word.color-0 { color: #00A699; } 
+    .hover-word.color-1 { color: #D19A66; } 
+    .hover-word.color-2 { color: #C57B9B; } 
+    .hover-word.color-3 { color: #6F9E74; } 
+    .hover-word.color-4 { color: #528BBA; } 
+    .hover-word.color-5 { color: #C4B251; } 
 
-    .hover-word.color-0:hover { background-color: rgba(3, 218, 198, 0.15); color: #fff; }
-    .hover-word.color-1:hover { background-color: rgba(255, 183, 77, 0.15); color: #fff; }
-    .hover-word.color-2:hover { background-color: rgba(244, 143, 177, 0.15); color: #fff; }
-    .hover-word.color-3:hover { background-color: rgba(129, 199, 132, 0.15); color: #fff; }
-    .hover-word.color-4:hover { background-color: rgba(100, 181, 246, 0.15); color: #fff; }
-    .hover-word.color-5:hover { background-color: rgba(255, 241, 118, 0.15); color: #fff; }
+    .hover-word.color-0:hover { background-color: rgba(0, 166, 153, 0.15); color: #fff; }
+    .hover-word.color-1:hover { background-color: rgba(209, 154, 102, 0.15); color: #fff; }
+    .hover-word.color-2:hover { background-color: rgba(197, 123, 155, 0.15); color: #fff; }
+    .hover-word.color-3:hover { background-color: rgba(111, 158, 116, 0.15); color: #fff; }
+    .hover-word.color-4:hover { background-color: rgba(82, 139, 186, 0.15); color: #fff; }
+    .hover-word.color-5:hover { background-color: rgba(196, 178, 81, 0.15); color: #fff; }
 
     .hover-word.speaking-word {
-      background: linear-gradient(to top, rgba(3, 218, 198, 0.45) 0%, rgba(3, 218, 198, 0.45) 20%, transparent 20%) !important;
-      box-shadow: 0 4px 12px -2px rgba(3, 218, 198, 0.7);
+      background: linear-gradient(to top, rgba(0, 166, 153, 0.45) 0%, rgba(0, 166, 153, 0.45) 20%, transparent 20%) !important;
+      box-shadow: 0 4px 12px -2px rgba(0, 166, 153, 0.7);
       border-radius: 2px;
     }
 
@@ -305,13 +305,15 @@
       font-family: inherit;
       flex: 1;
       min-height: 0;
-      padding: 15px;
+      padding: 20px;
       background-color: #1e1e1e;
-      color: #ffffff;
+      color: #8A9A86;                     
       border: 2px solid #333;
       border-radius: 8px;
       resize: none;
-      font-size: 16px;
+      font-size: 20px;                    
+      line-height: 1.6;                   
+      letter-spacing: 0.03em;             
       outline: none;
       overflow-y: auto;
       scrollbar-width: none;
@@ -325,7 +327,7 @@
       right: 15px;
       background: #2a2a2a;
       border: 1px solid #444;
-      color: #03dac6;
+      color: #00A699;
       width: 38px;
       height: 38px;
       border-radius: 50%;
@@ -339,13 +341,13 @@
     }
 
     .speak-icon-btn:hover {
-      background: #03dac6;
+      background: #00A699;
       color: #121212;
       transform: scale(1.05);
     }
 
     .speak-icon-btn.playing {
-      color: #ffb74d;
+      color: #D19A66;
       animation: pulse 1.2s infinite;
     }
 
@@ -375,7 +377,7 @@
       white-space: nowrap;
     }
 
-    #word-tooltip:hover { background-color: #03dac6; }
+    #word-tooltip:hover { background-color: #00A699; }
 
     .toastify {
       position: relative !important;
@@ -502,7 +504,7 @@
 
   <div class="top-bar">
     <div class="brand-area">
-      <h2>Private</h2>
+      <h2 class="text">Private</h2>
       <div id="toast-container"></div>
     </div>
     
