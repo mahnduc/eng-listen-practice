@@ -133,24 +133,54 @@
       font-size: 14px;
     }
 
-    textarea {
+    .text-container-wrapper {
+      position: relative;
       width: 100%;
       flex: 1;
-      padding: 15px;
-      padding-right: 55px;
       background-color: #1e1e1e;
-      color: #ffffff;
       border: 2px solid #333;
       border-radius: 8px;
-      resize: none;
-      font-size: 18px;
-      line-height: 1.6;
-      outline: none;
-      transition: border-color 0.3s;
+      overflow: hidden;
     }
 
-    textarea:focus {
-      border-color: #bb86fc;
+    textarea, .backdrop-highlight {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 15px;
+      padding-right: 55px;
+      font-size: 18px;
+      line-height: 1.6;
+      font-family: inherit;
+      margin: 0;
+      border: none;
+      outline: none;
+      background: transparent;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    textarea {
+      color: #ffffff;
+      z-index: 2;
+      caret-color: #ffffff;
+    }
+
+    .backdrop-highlight {
+      color: transparent;
+      z-index: 1;
+      overflow-y: auto;
+      pointer-events: none;
+    }
+
+    .speaking-word {
+      color: transparent;
+      border-radius: 0;
+      background: linear-gradient(to top, rgba(3, 218, 198, 0.4) 15%, transparent 15%);
+      box-shadow: 0 5px 10px -2px rgba(3, 218, 198, 0.8);
+      transition: all 0.08s ease;
     }
 
     .note-area {
@@ -166,13 +196,9 @@
       outline: none;
     }
 
-    .note-area:focus {
-      border-color: #03dac6;
-    }
-
     .speak-icon-btn {
       position: absolute;
-      top: 42px;
+      top: 15px;
       right: 15px;
       background: #2a2a2a;
       border: 1px solid #444;
@@ -201,17 +227,9 @@
     }
 
     @keyframes pulse {
-      0% {
-        opacity: 0.6;
-      }
-
-      50% {
-        opacity: 1;
-      }
-
-      100% {
-        opacity: 0.6;
-      }
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
     }
   </style>
 </head>
@@ -219,12 +237,12 @@
 <body>
 
   <div class="top-bar">
-    <h2>Phát Âm & Ghi Chú Tiếng Anh</h2>
+    <h2>Private</h2>
 
     <div class="history-controls">
       <label for="history-select"><i class="ri-history-line"></i> Lịch sử:</label>
       <select id="history-select">
-        <option value="">-- Chọn đoạn văn đã lưu --</option>
+        <option value="">Chọn đoạn văn đã lưu</option>
       </select>
 
       <button id="save-btn" class="icon-btn-inline save" title="Lưu đoạn văn hiện tại vào OPFS"><i
@@ -237,14 +255,17 @@
   <div class="main-layout">
     <div class="box-wrapper">
       <label class="field-label" for="text-to-speak">Đoạn văn bản tiếng Anh:</label>
-      <textarea id="text-to-speak" placeholder="Dán hoặc nhập đoạn tiếng Anh vào đây..."></textarea>
-      <button id="speak-btn" class="speak-icon-btn" title="Phát âm"><i class="ri-volume-up-fill"></i></button>
+      <div class="text-container-wrapper">
+        <div id="backdrop-highlight" class="backdrop-highlight"></div>
+        <textarea id="text-to-speak" placeholder="Dán hoặc nhập đoạn tiếng Anh vào đây..."></textarea>
+        <button id="speak-btn" class="speak-icon-btn" title="Phát âm"><i class="ri-volume-up-fill"></i></button>
+      </div>
     </div>
 
     <div class="box-wrapper half">
       <label class="field-label" for="text-note">Ghi chú cá nhân cho đoạn văn trên:</label>
       <textarea id="text-note" class="note-area"
-        placeholder="Nhập từ vựng cần nhớ, cấu trúc hoặc giải nghĩa cho đoạn văn này..."></textarea>
+        placeholder="Nhập từ vựng cần nhớ, cấu trúc hoặc giải nghĩa..."></textarea>
     </div>
   </div>
 
@@ -255,9 +276,18 @@
     const saveBtn = document.getElementById('save-btn');
     const historySelect = document.getElementById('history-select');
     const deleteItemBtn = document.getElementById('delete-item-btn');
+    const backdropHighlight = document.getElementById('backdrop-highlight');
 
     const FILE_NAME = "data_notes_v3.json";
     let savedData = [];
+
+    textArea.addEventListener('scroll', () => {
+      backdropHighlight.scrollTop = textArea.scrollTop;
+    });
+
+    textArea.addEventListener('input', () => {
+      backdropHighlight.innerHTML = escapeHtml(textArea.value);
+    });
 
     async function getOPFSFileHandle() {
       const root = await navigator.storage.getDirectory();
@@ -315,6 +345,7 @@
         const item = savedData[selectedIndex];
         textArea.value = item.text;
         noteArea.value = item.note;
+        backdropHighlight.innerHTML = escapeHtml(item.text);
       }
     });
 
@@ -357,14 +388,14 @@
 
         textArea.value = '';
         noteArea.value = '';
+        backdropHighlight.innerHTML = '';
       }
     });
 
-    // --- CHỨC NĂNG PHÁT ÂM (Web Speech API) ---
     speakBtn.addEventListener('click', () => {
-      const text = textArea.value.trim();
+      const text = textArea.value;
 
-      if (text === '') {
+      if (text.trim() === '') {
         alert('Không có văn bản để phát âm!');
         return;
       }
@@ -373,16 +404,43 @@
         if (window.speechSynthesis.speaking) {
           window.speechSynthesis.cancel();
           setSpeakState(false);
+          backdropHighlight.innerHTML = escapeHtml(text);
           return;
         }
 
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'en-US';
-        utterance.rate = 0.95;
+        utterance.rate = 0.90;
 
         utterance.onstart = () => setSpeakState(true);
-        utterance.onend = () => setSpeakState(false);
-        utterance.onerror = () => setSpeakState(false);
+        utterance.onend = () => {
+          setSpeakState(false);
+          backdropHighlight.innerHTML = escapeHtml(text);
+        };
+        utterance.onerror = () => {
+          setSpeakState(false);
+          backdropHighlight.innerHTML = escapeHtml(text);
+        };
+
+        utterance.onboundary = (event) => {
+          if (event.name === 'word') {
+            const charIndex = event.charIndex;
+            
+            let remainingText = text.substring(charIndex);
+            let match = remainingText.match(/^[\w']+/);
+            let wordLength = match ? match[0].length : 0;
+
+            if (wordLength > 0) {
+              const before = text.substring(0, charIndex);
+              const word = text.substring(charIndex, charIndex + wordLength);
+              const after = text.substring(charIndex + wordLength);
+
+              backdropHighlight.innerHTML = escapeHtml(before) + 
+                `<span class="speaking-word">${escapeHtml(word)}</span>` + 
+                escapeHtml(after);
+            }
+          }
+        };
 
         window.speechSynthesis.speak(utterance);
       } else {
@@ -400,6 +458,10 @@
         speakBtn.innerHTML = '<i class="ri-volume-up-fill"></i>';
         speakBtn.setAttribute('title', 'Phát âm');
       }
+    }
+
+    function escapeHtml(string) {
+      return string.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
     window.addEventListener('DOMContentLoaded', loadDataFromOPFS);
