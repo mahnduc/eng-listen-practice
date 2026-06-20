@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Private</title>
   <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
   <style>
     * { box-sizing: border-box; }
 
@@ -31,7 +33,24 @@
       flex-shrink: 0;
     }
 
-    h2 { margin: 0; color: #fff; font-size: 22px; }
+    .brand-area {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+    }
+
+    h2 { 
+      margin: 0; 
+      color: #fff; 
+      font-size: 22px; 
+      white-space: nowrap; 
+    }
+
+    #toast-container {
+      display: inline-flex;
+      align-items: center;
+    }
 
     .history-controls {
       display: flex;
@@ -53,21 +72,112 @@
       gap: 5px;
     }
 
-    select {
+    .custom-dropdown {
+      position: relative;
+      width: 250px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .dropdown-selected {
       background-color: #252525;
       color: #e0e0e0;
       border: 1px solid #444;
-      padding: 6px 30px 6px 10px;
-      font-size: 13px;
-      border-radius: 4px;
-      outline: none;
-      max-width: 250px;
+      padding: 6px 36px 6px 12px;
+      border-radius: 6px;
       cursor: pointer;
-      font-family: inherit;
-      transition: border-color 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      transition: border-color 0.15s, box-shadow 0.15s;
     }
 
-    select:focus { border-color: #bb86fc; }
+    .custom-dropdown.open .dropdown-selected {
+      border-color: #03dac6;
+      box-shadow: 0 0 0 2px rgba(3, 218, 198, 0.2);
+    }
+
+    .dropdown-selected::after {
+      content: '';
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23b0b0b0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+      background-repeat: no-repeat;
+      background-position: center;
+      transition: transform 0.2s ease;
+    }
+
+    .custom-dropdown.open .dropdown-selected::after {
+      transform: translateY(-50%) rotate(180deg);
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      width: 100%;
+      background-color: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 6px 0;
+      margin: 0;
+      list-style: none;
+      z-index: 999;
+      max-height: 240px;
+      overflow-y: auto;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+      opacity: 0;
+      transform: translateY(-8px);
+      pointer-events: none;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      scrollbar-width: thin;
+      scrollbar-color: #444 #1e1e1e;
+    }
+
+    .dropdown-menu::-webkit-scrollbar {
+      width: 6px;
+    }
+    .dropdown-menu::-webkit-scrollbar-thumb {
+      background: #444;
+      border-radius: 3px;
+    }
+
+    .custom-dropdown.open .dropdown-menu {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .dropdown-item {
+      padding: 8px 14px;
+      color: #b0b0b0;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .dropdown-item:hover {
+      background-color: rgba(3, 218, 198, 0.1);
+      color: #03dac6;
+    }
+
+    .dropdown-item.selected {
+      background-color: rgba(3, 218, 198, 0.15);
+      color: #fff;
+      font-weight: bold;
+    }
 
     .icon-btn-inline {
       background: #252525;
@@ -84,6 +194,8 @@
 
     .icon-btn-inline.save { color: #03dac6; }
     .icon-btn-inline.save:hover { background-color: #03dac6; color: #121212; }
+    .icon-btn-inline.refresh { color: #64b5f6; }
+    .icon-btn-inline.refresh:hover { background-color: #64b5f6; color: #121212; }
     .icon-btn-inline.delete { color: #ef5350; }
     .icon-btn-inline.delete:hover { background-color: #ef5350; color: #121212; }
 
@@ -100,14 +212,6 @@
       flex-direction: column;
       min-height: 0;
       position: relative;
-    }
-
-    label.field-label {
-      margin-bottom: 8px;
-      font-weight: bold;
-      color: #b0b0b0;
-      font-size: 14px;
-      flex-shrink: 0;
     }
 
     .text-container-wrapper {
@@ -273,43 +377,145 @@
 
     #word-tooltip:hover { background-color: #03dac6; }
 
-    .toast {
+    .toastify {
+      position: relative !important;
+      top: auto !important;
+      bottom: auto !important;
+      left: auto !important;
+      right: auto !important;
+      display: inline-block !important; 
+      width: auto !important;             
+      max-width: none !important;         
+      white-space: nowrap !important;     
+      border-radius: 6px !important;
+      font-family: inherit !important;
+      font-size: 13px !important;
+      font-weight: bold !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important;
+      padding: 6px 14px !important;       
+      margin: 0 !important;
+      animation: toastFadeIn 0.2s ease-out;
+    }
+
+    @keyframes toastFadeIn {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .modal-overlay {
       position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(8px);
-      background: #252525;
-      border: 1px solid #444;
-      color: #e0e0e0;
-      padding: 7px 18px;
-      border-radius: 8px;
-      font-size: 13px;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       opacity: 0;
-      transition: opacity 0.18s, transform 0.18s;
       pointer-events: none;
-      z-index: 9998;
-      white-space: nowrap;
+      transition: opacity 0.2s ease;
     }
 
-    .toast.show {
+    .modal-overlay.active {
       opacity: 1;
-      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
     }
 
-    .toast.ok { border-color: #03dac6; color: #03dac6; }
-    .toast.err { border-color: #ef5350; color: #ef5350; }
+    .modal-box {
+      background-color: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 24px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      transform: scale(0.9);
+      transition: transform 0.2s ease;
+    }
+
+    .modal-overlay.active .modal-box {
+      transform: scale(1);
+    }
+
+    .modal-title {
+      margin: 0 0 12px 0;
+      color: #fff;
+      font-size: 18px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-title i {
+      color: #ef5350;
+    }
+
+    .modal-message {
+      color: #b0b0b0;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .modal-btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: inherit;
+      border: 1px solid transparent;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .modal-btn.cancel {
+      background-color: #252525;
+      border-color: #444;
+      color: #e0e0e0;
+    }
+
+    .modal-btn.cancel:hover {
+      background-color: #333;
+    }
+
+    .modal-btn.confirm {
+      background-color: #ef5350;
+      color: #fff;
+    }
+
+    .modal-btn.confirm:hover {
+      background-color: #d32f2f;
+    }
   </style>
 </head>
 <body>
 
   <div class="top-bar">
-    <h2>Private</h2>
+    <div class="brand-area">
+      <h2>Private</h2>
+      <div id="toast-container"></div>
+    </div>
+    
     <div class="history-controls">
-      <label for="history-select"><i class="ri-history-line"></i> Lịch sử:</label>
-      <select id="history-select">
-        <option value="">Chọn đoạn văn đã lưu</option>
-      </select>
+      <label><i class="ri-history-line"></i> Lịch sử:</label>
+      
+      <div id="custom-dropdown" class="custom-dropdown">
+        <div id="dropdown-selected" class="dropdown-selected">Chọn đoạn văn đã lưu</div>
+        <ul id="dropdown-menu" class="dropdown-menu"></ul>
+      </div>
+
       <button id="save-btn" class="icon-btn-inline save" title="Lưu đoạn văn hiện tại"><i class="ri-save-line"></i></button>
+      <button id="refresh-btn" class="icon-btn-inline refresh" title="Tự động lưu & Làm sạch nội dung"><i class="ri-refresh-line"></i></button>
       <button id="delete-item-btn" class="icon-btn-inline delete" title="Xóa mục đang chọn"><i class="ri-delete-bin-6-line"></i></button>
     </div>
   </div>
@@ -323,46 +529,79 @@
       </div>
     </div>
     <div class="box-wrapper">
-      <label class="field-label" for="text-note">Ghi chú cá nhân cho đoạn văn trên:</label>
-      <textarea id="text-note" class="note-area" placeholder="Nhập từ vựng cần nhớ, cấu trúc hoặc giải nghĩa..."></textarea>
+      <textarea id="text-note" class="note-area" placeholder="Ghi chú của bạn..."></textarea>
     </div>
   </div>
 
   <div id="word-tooltip"><i class="ri-volume-up-fill"></i> Nghe</div>
-  <div id="toast" class="toast"></div>
+
+  <div id="delete-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-title">
+        <i class="ri-alert-fill"></i> Xác nhận xóa
+      </div>
+      <div class="modal-message">
+        Bạn có chắc chắn muốn xóa vĩnh viễn mục lịch sử đang chọn không? Hành động này không thể hoàn tác.
+      </div>
+      <div class="modal-actions">
+        <button id="modal-cancel-btn" class="modal-btn cancel">Hủy bỏ</button>
+        <button id="modal-confirm-btn" class="modal-btn confirm">Xóa ngay</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
   <script>
     const textArea = document.getElementById('text-to-speak');
     const noteArea = document.getElementById('text-note');
     const speakBtn = document.getElementById('speak-btn');
     const saveBtn = document.getElementById('save-btn');
-    const historySelect = document.getElementById('history-select');
+    const refreshBtn = document.getElementById('refresh-btn');
     const deleteItemBtn = document.getElementById('delete-item-btn');
     const backdrop = document.getElementById('backdrop-highlight');
     const wordTooltip = document.getElementById('word-tooltip');
-    const toastEl = document.getElementById('toast');
+    
+    const dropdownWrapper = document.getElementById('custom-dropdown');
+    const dropdownSelected = document.getElementById('dropdown-selected');
+    const dropdownMenu = document.getElementById('dropdown-menu');
+
+    const deleteModal = document.getElementById('delete-modal');
+    const modalCancelBtn = document.getElementById('modal-cancel-btn');
+    const modalConfirmBtn = document.getElementById('modal-confirm-btn');
 
     const FILE_NAME = "data_notes_v3.json";
     let savedData = [];
-
     let wordSpans = [];
     let activeWordIndex = -1;
-
     let tooltipTarget = null;
     let tooltipTimer = null;
-
     let inputTimer = null;
-    let toastTimer = null;
+    let currentSelectedValue = "";
 
     function escapeHtml(s) {
       return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
     function showToast(msg, type) {
-      clearTimeout(toastTimer);
-      toastEl.textContent = msg;
-      toastEl.className = 'toast show' + (type ? ' ' + type : '');
-      toastTimer = setTimeout(() => { toastEl.className = 'toast'; }, 2000);
+      document.getElementById('toast-container').innerHTML = '';
+      let bgGradient = "linear-gradient(to right, #2e2e2e, #424242)";
+      if (type === 'ok') {
+        bgGradient = "linear-gradient(to right, #00b09b, #96c93d)";
+      } else if (type === 'err') {
+        bgGradient = "linear-gradient(to right, #ff5f6d, #ffc371)";
+      } else if (type === 'info') {
+        bgGradient = "linear-gradient(to right, #2193b0, #6dd5ed)";
+      }
+      Toastify({
+        text: msg,
+        duration: 2200,
+        selector: "toast-container", 
+        gravity: "top", 
+        position: "left", 
+        style: { background: bgGradient },
+        stopOnFocus: false
+      }).showToast();
     }
 
     function renderHighlight(text) {
@@ -370,13 +609,10 @@
       wordSpans = [];
       activeWordIndex = -1;
       if (!text) return;
-
       const normalizedText = text.replace(/\r\n/g, '\n');
-
       const tokens = normalizedText.split(/(\s+)/);
       let wi = 0;
       let html = '';
-
       tokens.forEach(token => {
         if (/^\s+$/.test(token)) {
           html += escapeHtml(token);
@@ -390,14 +626,11 @@
           html += escapeHtml(token);
         }
       });
-
       if (normalizedText.endsWith('\n')) {
         html += '<br>';
       }
-
       backdrop.innerHTML = html;
       wordSpans = Array.from(backdrop.querySelectorAll('.hover-word'));
-
       wordSpans.forEach(span => {
         span.addEventListener('mouseenter', onSpanEnter);
         span.addEventListener('mouseleave', onSpanLeave);
@@ -432,13 +665,10 @@
     function onSpanEnter(e) {
       if (window.speechSynthesis.speaking) return;
       clearTimeout(tooltipTimer);
-
       tooltipTarget = e.currentTarget;
       const rect = tooltipTarget.getBoundingClientRect();
-
       wordTooltip.style.display = 'flex';
       wordTooltip.style.visibility = 'hidden';
-
       requestAnimationFrame(() => {
         const tw = wordTooltip.offsetWidth;
         const left = Math.max(4, rect.left + rect.width / 2 - tw / 2);
@@ -458,7 +688,6 @@
     }
 
     wordTooltip.addEventListener('mouseenter', () => clearTimeout(tooltipTimer));
-
     wordTooltip.addEventListener('mouseleave', () => {
       wordTooltip.style.display = 'none';
       tooltipTarget = null;
@@ -484,9 +713,7 @@
     textArea.addEventListener('mouseup', () => {
       const sel = window.getSelection().toString().trim();
       if (!sel) return;
-
       speakWord(sel);
-
       const cur = noteArea.value;
       const line = `- ${sel}: `;
       noteArea.value = cur === '' ? line : (cur.endsWith('\n') ? cur + line : cur + '\n' + line);
@@ -505,33 +732,25 @@
     speakBtn.addEventListener('click', () => {
       const text = textArea.value;
       if (!text.trim()) { showToast('Không có văn bản để phát âm!', 'err'); return; }
-
       if (window.speechSynthesis.speaking) {
         window.speechSynthesis.cancel();
         setSpeakState(false);
         setActiveWord(-1);
         return;
       }
-
       wordTooltip.style.display = 'none';
-
       const utt = new SpeechSynthesisUtterance(text);
       utt.lang = 'en-US';
       utt.rate = 0.90;
-
       const charMap = buildCharMap(text);
-
       utt.onstart = () => setSpeakState(true);
-
       utt.onboundary = (ev) => {
         if (ev.name !== 'word') return;
         const wi = charMap[ev.charIndex];
         if (wi !== undefined) setActiveWord(wi);
       };
-
       utt.onend = () => { setSpeakState(false); setActiveWord(-1); };
       utt.onerror = () => { setSpeakState(false); setActiveWord(-1); };
-
       window.speechSynthesis.speak(utt);
     });
 
@@ -572,56 +791,143 @@
     }
 
     function updateDropdown() {
-      historySelect.innerHTML = '<option value="">-- Chọn đoạn văn đã lưu --</option>';
+      dropdownMenu.innerHTML = '';
+      
+      if (savedData.length === 0) {
+        dropdownSelected.textContent = "Chọn đoạn văn đã lưu";
+        currentSelectedValue = "";
+        return;
+      }
+
+      let hasSelected = false;
+
       [...savedData].reverse().forEach((item, i) => {
         const realIdx = savedData.length - 1 - i;
-        const opt = document.createElement('option');
-        opt.value = realIdx;
-        const preview = item.text.length > 30 ? item.text.substring(0, 30) + '...' : item.text;
-        opt.textContent = `[${item.date}] ${preview}`;
-        historySelect.appendChild(opt);
+        const li = document.createElement('li');
+        li.className = 'dropdown-item';
+        if (currentSelectedValue !== "" && Number(currentSelectedValue) === realIdx) {
+          li.classList.add('selected');
+          const preview = item.text.length > 22 ? item.text.substring(0, 22) + '...' : item.text;
+          dropdownSelected.textContent = `[${item.date}] ${preview}`;
+          hasSelected = true;
+        }
+        
+        const previewFull = item.text.length > 30 ? item.text.substring(0, 30) + '...' : item.text;
+        li.textContent = `[${item.date}] ${previewFull}`;
+        li.setAttribute('data-value', realIdx);
+
+        li.addEventListener('click', (e) => {
+          e.stopPropagation();
+          selectDropdownItem(realIdx);
+        });
+
+        dropdownMenu.appendChild(li);
       });
+
+      if (!hasSelected) {
+        dropdownSelected.textContent = "Chọn đoạn văn đã lưu";
+        currentSelectedValue = "";
+      }
     }
 
-    historySelect.addEventListener('change', () => {
-      const idx = historySelect.value;
-      if (!idx) return;
-      const item = savedData[Number(idx)];
+    function selectDropdownItem(idx) {
+      currentSelectedValue = String(idx);
+      dropdownWrapper.classList.remove('open');
+      
+      const item = savedData[idx];
       if (!item) return;
+
       textArea.value = item.text;
       noteArea.value = item.note || '';
       renderHighlight(item.text);
+      updateDropdown();
+    }
+
+    dropdownSelected.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdownWrapper.classList.toggle('open');
+    });
+
+    window.addEventListener('click', () => {
+      dropdownWrapper.classList.remove('open');
     });
 
     saveBtn.addEventListener('click', async () => {
       const text = textArea.value.trim();
       const note = noteArea.value.trim();
-      if (!text) { showToast('Vui lòng nhập đoạn văn trước khi lưu!', 'err'); return; }
-
+      if (!text) { showToast('Nhập đoạn văn trước khi lưu!', 'err'); return; }
       const stamp = new Date().toLocaleDateString('vi-VN', {
         year: 'numeric', month: '2-digit', day: '2-digit',
         hour: '2-digit', minute: '2-digit'
       });
-
       savedData.push({ text, note, date: stamp });
       await persistData();
+      currentSelectedValue = String(savedData.length - 1);
       updateDropdown();
-      historySelect.value = savedData.length - 1;
       showToast('Đã lưu thành công!', 'ok');
     });
 
-    deleteItemBtn.addEventListener('click', async () => {
-      const idx = historySelect.value;
-      if (!idx) { showToast('Vui lòng chọn một mục để xóa!', 'err'); return; }
-      if (!confirm('Bạn có chắc muốn xóa mục này không?')) return;
+    refreshBtn.addEventListener('click', async () => {
+      if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+        setSpeakState(false);
+      }
+      const text = textArea.value.trim();
+      const note = noteArea.value.trim();
+      if (text) {
+        const isExist = savedData.some(item => item.text === text);
+        if (!isExist) {
+          const stamp = new Date().toLocaleDateString('vi-VN', {
+            year: 'numeric', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit'
+          });
+          savedData.push({ text, note, date: stamp });
+          await persistData();
+          currentSelectedValue = "";
+          updateDropdown();
+          showToast('Đã tự động tạo mới!', 'ok');
+        }
+      }
+      textArea.value = '';
+      noteArea.value = '';
+      currentSelectedValue = "";
+      dropdownSelected.textContent = "Chọn đoạn văn đã lưu";
+      renderHighlight('');
+      if (!text) {
+        showToast('Đã làm sạch.', 'info');
+      }
+    });
 
-      savedData.splice(Number(idx), 1);
+    deleteItemBtn.addEventListener('click', () => {
+      if (currentSelectedValue === "") { showToast('Chọn mục để xóa!', 'err'); return; }
+      deleteModal.classList.add('active');
+    });
+
+    modalCancelBtn.addEventListener('click', () => {
+      deleteModal.classList.remove('active');
+    });
+
+    modalConfirmBtn.addEventListener('click', async () => {
+      deleteModal.classList.remove('active');
+      if (currentSelectedValue === "") return;
+
+      const idx = Number(currentSelectedValue);
+      savedData.splice(idx, 1);
       await persistData();
+      
+      currentSelectedValue = "";
       updateDropdown();
+      
       textArea.value = '';
       noteArea.value = '';
       renderHighlight('');
-      showToast('Đã xóa.', '');
+      showToast('Đã xóa mục.', 'info');
+    });
+
+    window.addEventListener('click', (e) => {
+      if (e.target === deleteModal) {
+        deleteModal.classList.remove('active');
+      }
     });
 
     window.addEventListener('DOMContentLoaded', loadData);
