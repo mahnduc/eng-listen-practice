@@ -1,16 +1,12 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Private</title>
   <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
+    * { box-sizing: border-box; }
 
     body {
       background-color: #121212;
@@ -22,6 +18,7 @@
       height: 100vh;
       width: 100vw;
       overflow: hidden;
+      font-family: ui-rounded, 'Segoe UI CY', 'Nimbus Sans L', sans-serif;
     }
 
     .top-bar {
@@ -31,13 +28,10 @@
       margin-bottom: 20px;
       padding-bottom: 10px;
       border-bottom: 1px solid #222;
+      flex-shrink: 0;
     }
 
-    h2 {
-      margin: 0;
-      color: #fff;
-      font-size: 22px;
-    }
+    h2 { margin: 0; color: #fff; font-size: 22px; }
 
     .history-controls {
       display: flex;
@@ -69,11 +63,11 @@
       outline: none;
       max-width: 250px;
       cursor: pointer;
+      font-family: inherit;
+      transition: border-color 0.15s;
     }
 
-    select:focus {
-      border-color: #bb86fc;
-    }
+    select:focus { border-color: #bb86fc; }
 
     .icon-btn-inline {
       background: #252525;
@@ -85,45 +79,27 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s;
+      transition: background 0.15s, color 0.15s;
     }
 
-    .icon-btn-inline.save {
-      color: #03dac6;
-    }
-
-    .icon-btn-inline.save:hover {
-      background-color: #03dac6;
-      color: #121212;
-    }
-
-    .icon-btn-inline.delete {
-      color: #ef5350;
-    }
-
-    .icon-btn-inline.delete:hover {
-      background-color: #ef5350;
-      color: #121212;
-    }
+    .icon-btn-inline.save { color: #03dac6; }
+    .icon-btn-inline.save:hover { background-color: #03dac6; color: #121212; }
+    .icon-btn-inline.delete { color: #ef5350; }
+    .icon-btn-inline.delete:hover { background-color: #ef5350; color: #121212; }
 
     .main-layout {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
       flex: 1;
-      width: 100%;
-      height: calc(100% - 65px);
+      min-height: 0;
     }
 
     .box-wrapper {
-      flex: 1.2;
       display: flex;
       flex-direction: column;
+      min-height: 0;
       position: relative;
-    }
-
-    .box-wrapper.half {
-      flex: 0.8;
     }
 
     label.field-label {
@@ -131,61 +107,100 @@
       font-weight: bold;
       color: #b0b0b0;
       font-size: 14px;
+      flex-shrink: 0;
     }
 
     .text-container-wrapper {
       position: relative;
-      width: 100%;
       flex: 1;
+      min-height: 0;
       background-color: #1e1e1e;
       border: 2px solid #333;
-      border-radius: 8px;
+      border-radius: 12px;
       overflow: hidden;
     }
 
-    textarea, .backdrop-highlight {
+    .backdrop-highlight, textarea#text-to-speak {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      padding: 15px;
-      padding-right: 55px;
-      font-size: 18px;
-      line-height: 1.6;
-      font-family: inherit;
-      margin: 0;
-      border: none;
-      outline: none;
-      background: transparent;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
-
-    textarea {
-      color: #ffffff;
-      z-index: 2;
-      caret-color: #ffffff;
+      margin: 0 !important;
+      border: 2px solid transparent !important; 
+      padding: 20px 55px 20px 20px !important;
+      box-sizing: border-box !important;
+      font-family: ui-rounded, 'Segoe UI CY', 'Nimbus Sans L', sans-serif !important;
+      font-size: 24px !important;
+      font-weight: 600 !important;
+      line-height: 1.6 !important;
+      white-space: pre-wrap !important;
+      word-wrap: break-word !important;
+      overflow-wrap: break-word !important;
+      letter-spacing: normal !important;
+      word-spacing: normal !important;
+      text-transform: none !important;
+      text-align: start !important;
+      text-rendering: optimizeLegibility !important;
+      -webkit-font-smoothing: antialiased;
     }
 
     .backdrop-highlight {
       color: transparent;
-      z-index: 1;
       overflow-y: auto;
       pointer-events: none;
+      z-index: 1;
+      scrollbar-width: none;
     }
 
-    .speaking-word {
-      color: transparent;
-      border-radius: 0;
-      background: linear-gradient(to top, rgba(3, 218, 198, 0.4) 15%, transparent 15%);
-      box-shadow: 0 5px 10px -2px rgba(3, 218, 198, 0.8);
-      transition: all 0.08s ease;
+    .backdrop-highlight::-webkit-scrollbar { display: none; }
+
+    textarea#text-to-speak {
+      background: transparent !important;
+      color: transparent !important;
+      caret-color: #ffffff !important;
+      outline: none !important;
+      resize: none !important;
+      z-index: 2;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+
+    textarea#text-to-speak::-webkit-scrollbar { display: none; }
+
+    .hover-word {
+      position: relative;
+      border-radius: 6px;
+      padding: 0; 
+      margin: 0;
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s;
+    }
+
+    .hover-word.color-0 { color: #03dac6; }
+    .hover-word.color-1 { color: #ffb74d; }
+    .hover-word.color-2 { color: #f48fb1; }
+    .hover-word.color-3 { color: #81c784; }
+    .hover-word.color-4 { color: #64b5f6; }
+    .hover-word.color-5 { color: #fff176; }
+
+    .hover-word.color-0:hover { background-color: rgba(3, 218, 198, 0.15); color: #fff; }
+    .hover-word.color-1:hover { background-color: rgba(255, 183, 77, 0.15); color: #fff; }
+    .hover-word.color-2:hover { background-color: rgba(244, 143, 177, 0.15); color: #fff; }
+    .hover-word.color-3:hover { background-color: rgba(129, 199, 132, 0.15); color: #fff; }
+    .hover-word.color-4:hover { background-color: rgba(100, 181, 246, 0.15); color: #fff; }
+    .hover-word.color-5:hover { background-color: rgba(255, 241, 118, 0.15); color: #fff; }
+
+    .hover-word.speaking-word {
+      background: linear-gradient(to top, rgba(3, 218, 198, 0.45) 0%, rgba(3, 218, 198, 0.45) 20%, transparent 20%) !important;
+      box-shadow: 0 4px 12px -2px rgba(3, 218, 198, 0.7);
+      border-radius: 2px;
     }
 
     .note-area {
-      width: 100%;
+      font-family: inherit;
       flex: 1;
+      min-height: 0;
       padding: 15px;
       background-color: #1e1e1e;
       color: #ffffff;
@@ -194,7 +209,11 @@
       resize: none;
       font-size: 16px;
       outline: none;
+      overflow-y: auto;
+      scrollbar-width: none;
     }
+
+    .note-area::-webkit-scrollbar { display: none; }
 
     .speak-icon-btn {
       position: absolute;
@@ -202,7 +221,7 @@
       right: 15px;
       background: #2a2a2a;
       border: 1px solid #444;
-      color: #bb86fc;
+      color: #03dac6;
       width: 38px;
       height: 38px;
       border-radius: 50%;
@@ -211,12 +230,12 @@
       justify-content: center;
       cursor: pointer;
       font-size: 18px;
-      transition: all 0.2s;
+      transition: background 0.2s, color 0.2s, transform 0.2s;
       z-index: 10;
     }
 
     .speak-icon-btn:hover {
-      background: #bb86fc;
+      background: #03dac6;
       color: #121212;
       transform: scale(1.05);
     }
@@ -231,43 +250,86 @@
       50% { opacity: 1; }
       100% { opacity: 0.6; }
     }
+
+    #word-tooltip {
+      position: fixed;
+      z-index: 9999;
+      background: #ffffff;
+      color: #121212;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-family: inherit;
+      font-weight: bold;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      user-select: none;
+      pointer-events: auto;
+      white-space: nowrap;
+    }
+
+    #word-tooltip:hover { background-color: #03dac6; }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      background: #252525;
+      border: 1px solid #444;
+      color: #e0e0e0;
+      padding: 7px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      opacity: 0;
+      transition: opacity 0.18s, transform 0.18s;
+      pointer-events: none;
+      z-index: 9998;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .toast.ok { border-color: #03dac6; color: #03dac6; }
+    .toast.err { border-color: #ef5350; color: #ef5350; }
   </style>
 </head>
-
 <body>
 
   <div class="top-bar">
     <h2>Private</h2>
-
     <div class="history-controls">
       <label for="history-select"><i class="ri-history-line"></i> Lịch sử:</label>
       <select id="history-select">
         <option value="">Chọn đoạn văn đã lưu</option>
       </select>
-
-      <button id="save-btn" class="icon-btn-inline save" title="Lưu đoạn văn hiện tại vào OPFS"><i
-          class="ri-save-line"></i></button>
-      <button id="delete-item-btn" class="icon-btn-inline delete" title="Xóa mục đang chọn khỏi OPFS"><i
-          class="ri-delete-bin-6-line"></i></button>
+      <button id="save-btn" class="icon-btn-inline save" title="Lưu đoạn văn hiện tại"><i class="ri-save-line"></i></button>
+      <button id="delete-item-btn" class="icon-btn-inline delete" title="Xóa mục đang chọn"><i class="ri-delete-bin-6-line"></i></button>
     </div>
   </div>
 
   <div class="main-layout">
     <div class="box-wrapper">
-      <label class="field-label" for="text-to-speak">Đoạn văn bản tiếng Anh:</label>
-      <div class="text-container-wrapper">
+      <div class="text-container-wrapper" id="text-wrapper">
         <div id="backdrop-highlight" class="backdrop-highlight"></div>
         <textarea id="text-to-speak" placeholder="Dán hoặc nhập đoạn tiếng Anh vào đây..."></textarea>
-        <button id="speak-btn" class="speak-icon-btn" title="Phát âm"><i class="ri-volume-up-fill"></i></button>
+        <button id="speak-btn" class="speak-icon-btn" title="Phát âm toàn bộ"><i class="ri-volume-up-fill"></i></button>
       </div>
     </div>
-
-    <div class="box-wrapper half">
+    <div class="box-wrapper">
       <label class="field-label" for="text-note">Ghi chú cá nhân cho đoạn văn trên:</label>
-      <textarea id="text-note" class="note-area"
-        placeholder="Nhập từ vựng cần nhớ, cấu trúc hoặc giải nghĩa..."></textarea>
+      <textarea id="text-note" class="note-area" placeholder="Nhập từ vựng cần nhớ, cấu trúc hoặc giải nghĩa..."></textarea>
     </div>
   </div>
+
+  <div id="word-tooltip"><i class="ri-volume-up-fill"></i> Nghe</div>
+  <div id="toast" class="toast"></div>
 
   <script>
     const textArea = document.getElementById('text-to-speak');
@@ -276,197 +338,293 @@
     const saveBtn = document.getElementById('save-btn');
     const historySelect = document.getElementById('history-select');
     const deleteItemBtn = document.getElementById('delete-item-btn');
-    const backdropHighlight = document.getElementById('backdrop-highlight');
+    const backdrop = document.getElementById('backdrop-highlight');
+    const wordTooltip = document.getElementById('word-tooltip');
+    const toastEl = document.getElementById('toast');
 
     const FILE_NAME = "data_notes_v3.json";
     let savedData = [];
 
+    let wordSpans = [];
+    let activeWordIndex = -1;
+
+    let tooltipTarget = null;
+    let tooltipTimer = null;
+
+    let inputTimer = null;
+    let toastTimer = null;
+
+    function escapeHtml(s) {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function showToast(msg, type) {
+      clearTimeout(toastTimer);
+      toastEl.textContent = msg;
+      toastEl.className = 'toast show' + (type ? ' ' + type : '');
+      toastTimer = setTimeout(() => { toastEl.className = 'toast'; }, 2000);
+    }
+
+    function renderHighlight(text) {
+      backdrop.innerHTML = '';
+      wordSpans = [];
+      activeWordIndex = -1;
+      if (!text) return;
+
+      const normalizedText = text.replace(/\r\n/g, '\n');
+
+      const tokens = normalizedText.split(/(\s+)/);
+      let wi = 0;
+      let html = '';
+
+      tokens.forEach(token => {
+        if (/^\s+$/.test(token)) {
+          html += escapeHtml(token);
+          return;
+        }
+        const clean = token.replace(/^[^\w']+|[^\w']+$/g, '');
+        if (clean.length > 0) {
+          html += `<span class="hover-word color-${wi % 6}" data-word="${escapeHtml(clean)}" data-wi="${wi}">${escapeHtml(token)}</span>`;
+          wi++;
+        } else {
+          html += escapeHtml(token);
+        }
+      });
+
+      if (normalizedText.endsWith('\n')) {
+        html += '<br>';
+      }
+
+      backdrop.innerHTML = html;
+      wordSpans = Array.from(backdrop.querySelectorAll('.hover-word'));
+
+      wordSpans.forEach(span => {
+        span.addEventListener('mouseenter', onSpanEnter);
+        span.addEventListener('mouseleave', onSpanLeave);
+      });
+    }
+
+    function setActiveWord(idx) {
+      if (activeWordIndex >= 0 && wordSpans[activeWordIndex]) {
+        wordSpans[activeWordIndex].classList.remove('speaking-word');
+      }
+      activeWordIndex = idx;
+      if (idx >= 0 && wordSpans[idx]) {
+        wordSpans[idx].classList.add('speaking-word');
+      }
+    }
+
+    function buildCharMap(text) {
+      const map = {};
+      let wi = 0;
+      const re = /\S+/g;
+      let m;
+      while ((m = re.exec(text)) !== null) {
+        const clean = m[0].replace(/^[^\w']+|[^\w']+$/g, '');
+        if (clean.length > 0) {
+          map[m.index] = wi;
+          wi++;
+        }
+      }
+      return map;
+    }
+
+    function onSpanEnter(e) {
+      if (window.speechSynthesis.speaking) return;
+      clearTimeout(tooltipTimer);
+
+      tooltipTarget = e.currentTarget;
+      const rect = tooltipTarget.getBoundingClientRect();
+
+      wordTooltip.style.display = 'flex';
+      wordTooltip.style.visibility = 'hidden';
+
+      requestAnimationFrame(() => {
+        const tw = wordTooltip.offsetWidth;
+        const left = Math.max(4, rect.left + rect.width / 2 - tw / 2);
+        wordTooltip.style.left = left + 'px';
+        wordTooltip.style.top = (rect.top - wordTooltip.offsetHeight - 6) + 'px';
+        wordTooltip.style.visibility = 'visible';
+      });
+    }
+
+    function onSpanLeave() {
+      tooltipTimer = setTimeout(() => {
+        if (!wordTooltip.matches(':hover')) {
+          wordTooltip.style.display = 'none';
+          tooltipTarget = null;
+        }
+      }, 100);
+    }
+
+    wordTooltip.addEventListener('mouseenter', () => clearTimeout(tooltipTimer));
+
+    wordTooltip.addEventListener('mouseleave', () => {
+      wordTooltip.style.display = 'none';
+      tooltipTarget = null;
+    });
+
+    wordTooltip.addEventListener('click', () => {
+      if (tooltipTarget) {
+        speakWord(tooltipTarget.dataset.word);
+        wordTooltip.style.display = 'none';
+        tooltipTarget = null;
+      }
+    });
+
     textArea.addEventListener('scroll', () => {
-      backdropHighlight.scrollTop = textArea.scrollTop;
+      backdrop.scrollTop = textArea.scrollTop;
     });
 
     textArea.addEventListener('input', () => {
-      backdropHighlight.innerHTML = escapeHtml(textArea.value);
+      clearTimeout(inputTimer);
+      inputTimer = setTimeout(() => renderHighlight(textArea.value), 40);
     });
 
-    async function getOPFSFileHandle() {
-      const root = await navigator.storage.getDirectory();
-      return await root.getFileHandle(FILE_NAME, { create: true });
+    textArea.addEventListener('mouseup', () => {
+      const sel = window.getSelection().toString().trim();
+      if (!sel) return;
+
+      speakWord(sel);
+
+      const cur = noteArea.value;
+      const line = `- ${sel}: `;
+      noteArea.value = cur === '' ? line : (cur.endsWith('\n') ? cur + line : cur + '\n' + line);
+      noteArea.scrollTop = noteArea.scrollHeight;
+    });
+
+    function speakWord(text) {
+      if (!window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
+      const utt = new SpeechSynthesisUtterance(text);
+      utt.lang = 'en-US';
+      utt.rate = 0.90;
+      window.speechSynthesis.speak(utt);
     }
 
-    async function loadDataFromOPFS() {
-      try {
-        const fileHandle = await getOPFSFileHandle();
-        const file = await fileHandle.getFile();
-        const text = await file.text();
-        if (text) {
-          savedData = JSON.parse(text);
-        } else {
-          savedData = [];
-        }
-      } catch (e) {
-        console.error("Lỗi đọc OPFS:", e);
-        savedData = [];
+    speakBtn.addEventListener('click', () => {
+      const text = textArea.value;
+      if (!text.trim()) { showToast('Không có văn bản để phát âm!', 'err'); return; }
+
+      if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+        setSpeakState(false);
+        setActiveWord(-1);
+        return;
       }
+
+      wordTooltip.style.display = 'none';
+
+      const utt = new SpeechSynthesisUtterance(text);
+      utt.lang = 'en-US';
+      utt.rate = 0.90;
+
+      const charMap = buildCharMap(text);
+
+      utt.onstart = () => setSpeakState(true);
+
+      utt.onboundary = (ev) => {
+        if (ev.name !== 'word') return;
+        const wi = charMap[ev.charIndex];
+        if (wi !== undefined) setActiveWord(wi);
+      };
+
+      utt.onend = () => { setSpeakState(false); setActiveWord(-1); };
+      utt.onerror = () => { setSpeakState(false); setActiveWord(-1); };
+
+      window.speechSynthesis.speak(utt);
+    });
+
+    function setSpeakState(on) {
+      if (on) {
+        speakBtn.classList.add('playing');
+        speakBtn.innerHTML = '<i class="ri-volume-mute-fill"></i>';
+        speakBtn.title = 'Bấm để dừng';
+      } else {
+        speakBtn.classList.remove('playing');
+        speakBtn.innerHTML = '<i class="ri-volume-up-fill"></i>';
+        speakBtn.title = 'Phát âm toàn bộ';
+      }
+    }
+
+    async function getFileHandle() {
+      const root = await navigator.storage.getDirectory();
+      return root.getFileHandle(FILE_NAME, { create: true });
+    }
+
+    async function loadData() {
+      try {
+        const fh = await getFileHandle();
+        const file = await fh.getFile();
+        const raw = await file.text();
+        savedData = raw ? JSON.parse(raw) : [];
+      } catch { savedData = []; }
       updateDropdown();
     }
 
-    async function saveDataToOPFS() {
+    async function persistData() {
       try {
-        const fileHandle = await getOPFSFileHandle();
-        const writable = await fileHandle.createWritable();
-        await writable.write(JSON.stringify(savedData, null, 2));
-        await writable.close();
-      } catch (e) {
-        console.error("Lỗi ghi OPFS:", e);
-        alert("Không thể lưu file vào hệ thống!");
-      }
+        const fh = await getFileHandle();
+        const w = await fh.createWritable();
+        await w.write(JSON.stringify(savedData, null, 2));
+        await w.close();
+      } catch { showToast('Không thể lưu dữ liệu!', 'err'); }
     }
 
     function updateDropdown() {
       historySelect.innerHTML = '<option value="">-- Chọn đoạn văn đã lưu --</option>';
-
-      [...savedData].reverse().forEach((item, index) => {
-        const actualIndex = savedData.length - 1 - index;
-        const option = document.createElement('option');
-        option.value = actualIndex;
-
-        let shortText = item.text.substring(0, 30);
-        if (item.text.length > 30) shortText += "...";
-
-        option.textContent = `[${item.date}] ${shortText}`;
-        historySelect.appendChild(option);
+      [...savedData].reverse().forEach((item, i) => {
+        const realIdx = savedData.length - 1 - i;
+        const opt = document.createElement('option');
+        opt.value = realIdx;
+        const preview = item.text.length > 30 ? item.text.substring(0, 30) + '...' : item.text;
+        opt.textContent = `[${item.date}] ${preview}`;
+        historySelect.appendChild(opt);
       });
     }
 
     historySelect.addEventListener('change', () => {
-      const selectedIndex = historySelect.value;
-      if (selectedIndex !== "") {
-        const item = savedData[selectedIndex];
-        textArea.value = item.text;
-        noteArea.value = item.note;
-        backdropHighlight.innerHTML = escapeHtml(item.text);
-      }
+      const idx = historySelect.value;
+      if (!idx) return;
+      const item = savedData[Number(idx)];
+      if (!item) return;
+      textArea.value = item.text;
+      noteArea.value = item.note || '';
+      renderHighlight(item.text);
     });
 
     saveBtn.addEventListener('click', async () => {
       const text = textArea.value.trim();
       const note = noteArea.value.trim();
+      if (!text) { showToast('Vui lòng nhập đoạn văn trước khi lưu!', 'err'); return; }
 
-      if (!text) {
-        alert("Vui lòng nhập đoạn tiếng Anh trước khi lưu!");
-        return;
-      }
-
-      const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
-      const timestamp = new Date().toLocaleDateString('vi-VN', options);
-
-      savedData.push({
-        text: text,
-        note: note,
-        date: timestamp
+      const stamp = new Date().toLocaleDateString('vi-VN', {
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit'
       });
 
-      await saveDataToOPFS();
+      savedData.push({ text, note, date: stamp });
+      await persistData();
       updateDropdown();
-
       historySelect.value = savedData.length - 1;
-      alert("Đã lưu đoạn văn và ghi chú vào OPFS!");
+      showToast('Đã lưu thành công!', 'ok');
     });
 
     deleteItemBtn.addEventListener('click', async () => {
-      const selectedIndex = historySelect.value;
-      if (selectedIndex === "") {
-        alert("Vui lòng chọn một mục từ danh sách lịch sử để xóa!");
-        return;
-      }
+      const idx = historySelect.value;
+      if (!idx) { showToast('Vui lòng chọn một mục để xóa!', 'err'); return; }
+      if (!confirm('Bạn có chắc muốn xóa mục này không?')) return;
 
-      if (confirm("Bạn có chắc chắn muốn xóa mục lịch sử này không?")) {
-        savedData.splice(selectedIndex, 1);
-        await saveDataToOPFS();
-        updateDropdown();
-
-        textArea.value = '';
-        noteArea.value = '';
-        backdropHighlight.innerHTML = '';
-      }
+      savedData.splice(Number(idx), 1);
+      await persistData();
+      updateDropdown();
+      textArea.value = '';
+      noteArea.value = '';
+      renderHighlight('');
+      showToast('Đã xóa.', '');
     });
 
-    speakBtn.addEventListener('click', () => {
-      const text = textArea.value;
-
-      if (text.trim() === '') {
-        alert('Không có văn bản để phát âm!');
-        return;
-      }
-
-      if ('speechSynthesis' in window) {
-        if (window.speechSynthesis.speaking) {
-          window.speechSynthesis.cancel();
-          setSpeakState(false);
-          backdropHighlight.innerHTML = escapeHtml(text);
-          return;
-        }
-
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'en-US';
-        utterance.rate = 0.90;
-
-        utterance.onstart = () => setSpeakState(true);
-        utterance.onend = () => {
-          setSpeakState(false);
-          backdropHighlight.innerHTML = escapeHtml(text);
-        };
-        utterance.onerror = () => {
-          setSpeakState(false);
-          backdropHighlight.innerHTML = escapeHtml(text);
-        };
-
-        utterance.onboundary = (event) => {
-          if (event.name === 'word') {
-            const charIndex = event.charIndex;
-            
-            let remainingText = text.substring(charIndex);
-            let match = remainingText.match(/^[\w']+/);
-            let wordLength = match ? match[0].length : 0;
-
-            if (wordLength > 0) {
-              const before = text.substring(0, charIndex);
-              const word = text.substring(charIndex, charIndex + wordLength);
-              const after = text.substring(charIndex + wordLength);
-
-              backdropHighlight.innerHTML = escapeHtml(before) + 
-                `<span class="speaking-word">${escapeHtml(word)}</span>` + 
-                escapeHtml(after);
-            }
-          }
-        };
-
-        window.speechSynthesis.speak(utterance);
-      } else {
-        alert('Trình duyệt của bạn không hỗ trợ chức năng phát âm.');
-      }
-    });
-
-    function setSpeakState(isPlaying) {
-      if (isPlaying) {
-        speakBtn.classList.add('playing');
-        speakBtn.innerHTML = '<i class="ri-volume-mute-fill"></i>';
-        speakBtn.setAttribute('title', 'Bấm để dừng nói');
-      } else {
-        speakBtn.classList.remove('playing');
-        speakBtn.innerHTML = '<i class="ri-volume-up-fill"></i>';
-        speakBtn.setAttribute('title', 'Phát âm');
-      }
-    }
-
-    function escapeHtml(string) {
-      return string.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    }
-
-    window.addEventListener('DOMContentLoaded', loadDataFromOPFS);
+    window.addEventListener('DOMContentLoaded', loadData);
   </script>
-
 </body>
-
 </html>
